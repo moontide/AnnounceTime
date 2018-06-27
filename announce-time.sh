@@ -2,7 +2,7 @@
 dir=$(dirname "$0")
 cd "$dir"
 
-# 报时前的提士音，类似商场广播前要先有提示音一样
+# 报时前的提示音，类似商场广播前要先有提示音一样
 #NOTIFY_SOUND_FILE=/usr/share/asterisk/sounds/beep.gsm
 NOTIFY_SOUND_FILE=announce-time-notification.mp3
 
@@ -26,14 +26,16 @@ function GetTimeName ()
 echo "tm=$tm" >&2
 echo "sunrise=$sunrise" >&2
 echo "sunset=$sunset" >&2
-	# 日出时间字符串都是 0XXX 的样子，所以直接去掉前面的 0，免得在 bash 中被当做八进制数
-	sunrise=${sunrise:1}
-	n_tm="10#$tm"
+
+	n_tm=$((10#$tm))
+	#shopt -s extglob
+	#n_sunrise=${sunrise##+(0)}	# https://askubuntu.com/questions/889744/what-is-the-purpose-of-shopt-s-extglob
+	n_sunrise=$((10#$sunrise))
 	if [[ $n_tm -ge 0 && $n_tm -lt 100 ]]; then
 		time_name=半夜
-	elif [[ $n_tm -ge 100 && $n_tm -lt $sunrise ]]; then
+	elif [[ $n_tm -ge 100 && $n_tm -lt $n_sunrise ]]; then
 		time_name=凌晨
-	elif [[ $n_tm -ge $sunrise && $n_tm -lt 830 ]]; then
+	elif [[ $n_tm -ge $n_sunrise && $n_tm -lt 830 ]]; then
 		time_name=早上
 	elif [[ $n_tm -ge 830 && $n_tm -lt 1130 ]]; then
 		time_name=上午
