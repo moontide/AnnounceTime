@@ -15,8 +15,9 @@ mac="$3"
 BAIDU_VOICE_AVAILABLE_LANGUAGES_CODES=(zh ct en)
 BAIDU_VOICE_AVAILABLE_LANGUAGES_NAMES=(普通话 粤语 英语)
 
-BAIDU_VOICE_AVAILABLE_PERSONS_CODES=(0 1)
-BAIDU_VOICE_AVAILABLE_PERSONS_NAMES=(女声 男声)
+# 百度语音 TTS 发音人选择。注意： 取值范围是 0 1 3 4，没有 '2'
+BAIDU_VOICE_AVAILABLE_PERSONS_CODES=(0 1 3 4)
+BAIDU_VOICE_AVAILABLE_PERSONS_NAMES=(女声 男声 度逍遥 度丫丫)
 
 if [[ "$operation" == "tts" ]]
 then
@@ -60,6 +61,12 @@ then
 				;;
 			1)
 				speech_person_name=${BAIDU_VOICE_AVAILABLE_PERSONS_NAMES[1]}
+				;;
+			3)
+				speech_person_name=${BAIDU_VOICE_AVAILABLE_PERSONS_NAMES[2]}
+				;;
+			4)
+				speech_person_name=${BAIDU_VOICE_AVAILABLE_PERSONS_NAMES[3]}
 				;;
 			*)
 				# 如果【发音人代码】不指定或者写错代码，则从音库中【随机】挑选一个人播放
