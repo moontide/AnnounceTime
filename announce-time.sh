@@ -5,6 +5,7 @@ cd "$dir"
 # 报时前的提示音，类似商场广播前要先有提示音一样
 #NOTIFY_SOUND_FILE=/usr/share/asterisk/sounds/beep.gsm
 NOTIFY_SOUND_FILE=announce-time-notification.mp3
+today_sunrise_file=/tmp/today_sunrise.txt
 
 function baidu_tts ()
 {
@@ -14,7 +15,7 @@ function baidu_tts ()
 }
 
 # 获取时间段的描述，比如：上午、中午、晌午、下午/过晌午、傍晚、黄昏、夜间、深夜、凌晨、清晨
-# 传入的参数应该为 HHMM 组成的 4 位数字
+# 传入的参数应该为按 HHMM 格式组成的 4 位数字，如： 1604 - 16点04分
 # 参数1: 当前时间/指定时间
 # 参数2: 日出时间
 # 参数3: 日落时间
@@ -76,6 +77,7 @@ function GetShenZhenSunRiseSunSetInformation ()
 	today_sunset=$(echo "$SunMoonRiseSet_json" | jq -r ".${json_key}.data.sunSet")
 	today_moonrise=$(echo "$SunMoonRiseSet_json" | jq -r ".${json_key}.data.moonRise")
 	today_moonset=$(echo "$SunMoonRiseSet_json" | jq -r ".${json_key}.data.moonSet")
+	echo "$today_sunset" > "$today_sunrise_file"
 
 	# 将 HH:MM 中间的冒号去掉（变成 HHMM 格式），并输出
 	echo "深圳日出时间：${today_sunrise}" >&2
@@ -110,9 +112,13 @@ echo "日落时间： $sunset_time"
 echo "时间名称： $time_name"
 
 	# 生成要播报的文字
+	if [[ "$time_name" == "傍晚" ]]
+	then
+		sunset_information_for_tts="今天日落时间为 $(cat $today_sunrise_file) 分。"
+	fi
 	if [[ $mm == 00 ]]
 	then
-		announcement="$time_name $time_for_tts 整。"
+		announcement="$time_name $time_for_tts 整。$sunset_information_for_tts"
 		if [[ $((10#$hh % 4 )) == 0 ]]	# 每 4 小时（小时数是 4 的倍数）播放天气信息
 		then
 			# 获取深圳气象台天气信息
@@ -120,7 +126,7 @@ echo "时间名称： $time_name"
 			announcement="$announcement $weather"
 		fi
 	else
-		announcement="$time_name $time_for_tts 。"
+		announcement="$time_name $time_for_tts 。$sunset_information_for_tts"
 	fi
 echo "播报内容： $announcement"
 
