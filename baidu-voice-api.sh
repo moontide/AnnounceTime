@@ -226,7 +226,10 @@ then
 #-------------------------------------------------------------------------------
 	#url="$BAIDU_TTS_API_URL?lan=zh&per=$speetch_person&tok=$baidu_voice_api_access_token&ctp=1&cuid=$mac&tex=$param"
 
-	output_file_without_ext_name="$baidu_voice_api_results_dir/tts-${language_name}-${speech_person_name}-音量${volume}-音调${pitch}-速度${speed}-$param"
+	#param_hash=$(echo "$param" | sha256sum | cut -f1 -d' ')
+	#param_hash=$(echo "$param" | sha1sum | cut -f1 -d' ')
+	param_hash=$(echo "$param" | md5sum | cut -f1 -d' ')
+	output_file_without_ext_name="$baidu_voice_api_results_dir/tts-${language_name}-${speech_person_name}-音量${volume}-音调${pitch}-速度${speed}-${param_hash}-${param:0:10}"
 	output_file="$output_file_without_ext_name.mp3"
 	output_file_ogg="$output_file_without_ext_name.ogg"
 	http_headers_output_file="$output_file_without_ext_name.headers.txt"
